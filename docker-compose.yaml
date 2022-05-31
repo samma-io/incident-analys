@@ -1,0 +1,12 @@
+version: '3.4'
+services: 
+  parser:
+    build: .
+    command: ["-c", "/fluentd/etc/fluent.conf", "-v"]
+    volumes:
+      - ./input:/opt/input
+      - ./output:/opt/output
+      - ./state:/opt/state
+      - ./etc:/fluentd/etc
+
+     
