@@ -46,4 +46,36 @@ Here is where the ready file will come. The fluent will flush the buffer so it c
 The state keeps track of the state of the folder so you can add new file and run ta parser and it will onlye read the latest files.
 If you remove all files in the state folder you will start to parse all files form start.
 
+### Elastic and kibana
+The tool is now updated to also send the logs into elasticsearch for more data filtering.
+The parser take the logs and parse then into the output folder in json format. This files can then be added to many diffrent tools for process.
+In this project we att a new fluentd that reads the logs and store them into elasticsearch.
 
+We then load a kibana for you to search in the logs.
+
+#### Where are the indices
+The indices is called logstash- and then that year and date.
+So if you add more datata you can always delete the last date indece and keep track.
+
+
+
+Setup index pattern
+```
+http://localhost:5601/app/management/kibana/indexPatterns
+```
+pattern
+```
+logstash-*
+```
+
+
+
+To access kibana go to
+
+```
+http://localhost:5601
+```
+
+
+
+Remember we are using the events log as refernce so you need to set the date to show the events time.
