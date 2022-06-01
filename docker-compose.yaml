@@ -1,12 +1,58 @@
 version: '3.4'
 services: 
   parser:
+    build: .
     image: mattiashem/parser
     command: ["-c", "/fluentd/etc/fluent.conf", "-v"]
     volumes:
-      - ./input:/opt/input
+      - ./input/iis:/opt/input/iis
+      - ./input/json:/opt/input/json
+      - ./input/ws02:/opt/input/ws02
+      - ./input/logs:/opt/input/logs
       - ./output:/opt/output
       - ./state:/opt/state
       - ./etc:/fluentd/etc
-
-     
+    depends_on:
+      - kibana
+  upload:
+    build: .
+    image: mattiashem/parser
+    command: ["-c", "/fluentd/etc/fluent-es.conf", "-v"]
+    volumes:
+      - ./output:/opt/output
+      - ./state:/opt/state
+      - ./etc:/fluentd/etc
+    depends_on:
+      - kibana
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.0
+    container_name: elasticsearch
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms2g -Xmx2g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_add:
+      - IPC_LOCK
+  #  # enable this to keep your elastic data
+  #  #volumes:
+  #  #  -./elastic:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.16.0
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+    

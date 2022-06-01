@@ -1,1 +1,3 @@
-he
+[default]
+region=eu-north-1
+output=json
